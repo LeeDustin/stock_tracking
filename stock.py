@@ -20,76 +20,110 @@ def buy(c_percent, b_filename, p_filename):
 
 
     # update buy_history total cost, quantity, and stock
-    t_quantity = b_df.iloc[0]['Quantity']
-    t_cost = b_df.iloc[0]['Cost']
-    t_stock = b_df.iloc[0]['Stock']
-    t_quantity = t_quantity + quantity
-    t_cost = t_cost + cost
-    t_stock = t_stock + quantity
-    b_df.at[0,'Quantity'] = t_quantity
-    b_df.at[0, 'Cost'] = t_cost
-    b_df.at[0,'Stock'] = t_stock
+    b_t_quantity = b_df.iloc[0]['Quantity']
+    b_t_cost = b_df.iloc[0]['Cost']
+    b_t_holding = b_df.iloc[0]['Holding']
+    b_t_quantity = b_t_quantity + quantity
+    b_t_cost = b_t_cost + cost
+    b_t_holding = b_t_holding + quantity
+    b_df.at[0,'Quantity'] = b_t_quantity
+    b_df.at[0, 'Cost'] = b_t_cost
+    b_df.at[0,'Holding'] = b_t_holding
 
 
     # append new transaction and write to buy_history.xlsx
-    new_row = {'Date':date, 'Price':price, 'Quantity':quantity, 'Cost':cost, 'Stock':quantity}
+    new_row = {'Date':date, 'Price':price, 'Quantity':quantity, 'Cost':cost, 'Holding':quantity}
     b_df = b_df.append(new_row, ignore_index=True)
     print(b_df)
     b_df.to_excel(b_filename, index=False) 
 
     # update profit_summary 
-    c_stock = p_df.iloc[-1]['Stock']
-    c_balance = p_df.iloc[-1]['Balance']
-    c_rprofit = p_df.iloc[-1]['Realised Profit']
+    p_holding = p_df.iloc[-1]['Total Holding']
+    p_balance = p_df.iloc[-1]['Total Balance']
+    p_rprofit = p_df.iloc[-1]['Realised Profit']
     
-    c_uprofit = 0
+    p_uprofit = 0
     for index, row in b_df.iterrows():
         if (index == 0):
             continue
-        c_uprofit = c_uprofit+(price-row['Price'])*row['Stock']
-    print("unrealized profit:", c_uprofit)
+        p_uprofit = p_uprofit+(price-row['Price'])*row['Holding']
+    # print("unrealized profit:", p_uprofit)
 
     # append new transaction and write to profit_summary.xlsx
-    new_row = {'Date':date, 'Price':price, 'Stock':c_stock+quantity, \
-        'Balance':c_balance-cost, 'Realised Profit':c_rprofit, 'Unrealised Profit':c_uprofit}
+    new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding+quantity, \
+        'Total Balance':p_balance-cost, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
     p_df = p_df.append(new_row, ignore_index=True)
     print(p_df)
     p_df.to_excel(p_filename, index=False)
 
 
-def sell(s_filename, p_filename):
+def sell(b_filename, s_filename, p_filename):
     b_df = pd.read_excel(b_filename, index_col=None)
     s_df = pd.read_excel(s_filename, index_col=None)
-    p_df = pd.read_excel(s_filename, index_col=None)
-    print(b_df)
-    print(s_df)
+    p_df = pd.read_excel(p_filename, index_col=None)
+    # print(list(p_df.columns.values))
+
 
     date = input("Input transaction date (DD/MM/YYYY): ") or '-1'
     price = int(input("Input stock unit price: ") or '-1')
     quantity = int(input("Input sold stock quantity: ") or '-1')
     profit = price * quantity
 
-    # update buy_history total and individual stock
-
-    t_stock = b_df.iloc[0]['Stock']
-    if quantity > t_stock:
+    # update buy_history total and individual stock, then write it back
+    b_t_holding = b_df.iloc[0]['Holding']
+    if quantity > b_t_holding:
         exit("Error: sold quantity > holding quantity")
 
-    b_df.at[0,'Stock'] = t_stock
+    remaining_quantity = quantity
+    p_rprofit = p_df.iloc[-1]['Realised Profit']
+
+    for index, row in b_df.iterrows():
+        if index == 0 or b_df.iloc[index]['Holding'] == 0:
+            continue
+        if b_df.iloc[index]['Holding'] >= remaining_quantity:
+            print("buying at index " + str(index) + ", holding >= remiaining")
+            b_df.at[index, 'Holding'] = b_df.iloc[index]['Holding'] - remaining_quantity
+            p_rprofit = p_rprofit + remaining_quantity * (price - b_df.at[index, 'Price'])
+            b_df.at[0,'Holding'] = b_df.iloc[0]['Holding'] - remaining_quantity
+            break
+        if b_df.iloc[index]['Holding'] < remaining_quantity:
+            print("buying at index " + str(index) + ", holding < remiaining")
+            p_rprofit = p_rprofit + b_df.at[index, 'Holding'] * (price - b_df.at[index, 'Price'])
+            remaining_quantity = remaining_quantity - b_df.iloc[index]['Holding']
+            b_df.at[index, 'Holding'] = 0
+            b_df.at[0,'Holding'] = b_df.iloc[0]['Holding'] - b_df.iloc[index]['Holding']
+            continue
+    b_df.to_excel(b_filename, index=False) 
 
     # update sell_history total quantity and profit
-    t_quantity = s_df.iloc[0]['Quantity']
-    t_profit = s_df.iloc[0]['Profit']
-    t_quantity = t_quantity + quantity
-    t_profit = t_profit + profit
-    s_df.at[0,'Quantity'] = t_quantity
-    s_df.at[0, 'Profit'] = t_profit
+    s_t_quantity = s_df.iloc[0]['Quantity']
+    s_t_profit = s_df.iloc[0]['Profit']
+    s_t_quantity = s_t_quantity + quantity
+    s_t_profit = s_t_profit + profit
+    s_df.at[0,'Quantity'] = s_t_quantity
+    s_df.at[0, 'Profit'] = s_t_profit
 
     # append new transaction and write to sell_history.xlsx
     new_row = {'Date':date, 'Price':price, 'Quantity':quantity, 'Profit':profit}
-    p_df = p_df.append(new_row, ignore_index=True)
-    p_df.to_excel(p_filename, index=False) 
+    s_df = s_df.append(new_row, ignore_index=True)
+    s_df.to_excel(s_filename, index=False) 
 
+    # update profit_summary 
+    p_holding = p_df.iloc[-1]['Total Holding']
+    p_balance = p_df.iloc[-1]['Total Balance']
+
+    p_uprofit = 0
+    for index, row in b_df.iterrows():
+        if (index == 0):
+            continue
+        p_uprofit = p_uprofit+(price-row['Price'])*row['Holding']
+
+    # append new transaction and write to profit_summary.xlsx
+    new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding-quantity, \
+        'Total Balance':p_balance+profit, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
+    p_df = p_df.append(new_row, ignore_index=True)
+    print(p_df)
+    p_df.to_excel(p_filename, index=False)
 
 
 stock_name = input("Input stock name:  ") or 'test'
@@ -111,4 +145,4 @@ action = input("Input transaction type: buy or sell? ") or 'buy'
 if action == 'buy':
     buy(commision_percentage, b_filename, p_filename)
 if action == 'sell':
-    sell(s_filename, p_filename)
+    sell(b_filename, s_filename, p_filename)
