@@ -1,6 +1,8 @@
 import pandas as pd
 import queue
 from os.path import abspath
+import os.path
+from os import path
 
 def buy(c_percent, b_filename, p_filename):
     b_df = pd.read_excel(b_filename, index_col=None)
@@ -70,13 +72,18 @@ def sell(s_filename, p_filename):
 
 
 commision_percentage = 1
-b_filename = abspath('./abc/buy_history_test.xlsx')
-s_filename = abspath('./abc/sell_history_test.xlsx')
-p_filename = abspath('./abc/profit_summary_test.xlsx')
+stock_name = input("Input stock name:  ") or 'abc'
 
-# b_filename = abspath('./abc/buy_history.xlsx')
-# s_filename = abspath('./abc/sell_history.xlsx')
-# p_filename = abspath('./abc/profit_summary.xlsx')
+if (not path.exists(stock_name)):
+    exit("no stock named " + stock_name + " exists!")
+
+b_filename = abspath('./'+stock_name+'/buy_history_test.xlsx')
+s_filename = abspath('./'+stock_name+'/sell_history_test.xlsx')
+p_filename = abspath('./'+stock_name+'/profit_summary_test.xlsx')
+
+# b_filename = abspath('./'+stock_name+'/buy_history.xlsx')
+# s_filename = abspath('./'+stock_name+'/sell_history.xlsx')
+# p_filename = abspath('./'+stock_name+'/profit_summary.xlsx')
 
 
 action = input("Input transaction type: buy or sell? ") or 'buy'
