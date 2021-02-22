@@ -1,23 +1,19 @@
 import pandas as pd
-import queue
 from os.path import abspath
 import os.path
 from os import path
 
-def buy(c_percent, b_filename, p_filename):
+def buy_stock(c_percent, b_filename, p_filename):
 
     b_df = pd.read_excel(b_filename, index_col=None)
     p_df = pd.read_excel(p_filename, index_col=None)
-    print(b_df)
     # print(list(b_df.columns.values))
     # print(list(p_df.columns.values))
 
     date = input("Input transaction date (DD/MM/YYYY): ") or '-1'
-    price = int(input("Input stock unit price: ") or '-1') * c_percent
+    price = int(input("Input stock unit price: ") or '-1') * (1+c_percent/100)
     quantity = int(input("Input bought stock quantity: ") or '-1')
     cost = price * quantity
-
-
 
     # update buy_history total cost, quantity, and stock
     b_t_quantity = b_df.iloc[0]['Quantity']
@@ -34,7 +30,6 @@ def buy(c_percent, b_filename, p_filename):
     # append new transaction and write to buy_history.xlsx
     new_row = {'Date':date, 'Price':price, 'Quantity':quantity, 'Cost':cost, 'Holding':quantity}
     b_df = b_df.append(new_row, ignore_index=True)
-    print(b_df)
     b_df.to_excel(b_filename, index=False) 
 
     # update profit_summary 
@@ -53,11 +48,10 @@ def buy(c_percent, b_filename, p_filename):
     new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding+quantity, \
         'Total Balance':p_balance-cost, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
     p_df = p_df.append(new_row, ignore_index=True)
-    print(p_df)
     p_df.to_excel(p_filename, index=False)
 
 
-def sell(b_filename, s_filename, p_filename):
+def sell_stock(b_filename, s_filename, p_filename):
     b_df = pd.read_excel(b_filename, index_col=None)
     s_df = pd.read_excel(s_filename, index_col=None)
     p_df = pd.read_excel(p_filename, index_col=None)
@@ -122,8 +116,10 @@ def sell(b_filename, s_filename, p_filename):
     new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding-quantity, \
         'Total Balance':p_balance+profit, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
     p_df = p_df.append(new_row, ignore_index=True)
-    print(p_df)
     p_df.to_excel(p_filename, index=False)
+
+def create_new_stock(stock_name):
+    print("Created new folder for " + stock_name)
 
 
 stock_name = input("Input stock name:  ") or 'test'
@@ -139,10 +135,10 @@ p_filename = abspath('./'+stock_name+'/profit_summary_test.xlsx')
 # s_filename = abspath('./'+stock_name+'/sell_history.xlsx')
 # p_filename = abspath('./'+stock_name+'/profit_summary.xlsx')
 
-commision_percentage = 1
+commision_percentage = 5
 
 action = input("Input transaction type: buy or sell? ") or 'buy'
 if action == 'buy':
-    buy(commision_percentage, b_filename, p_filename)
+    buy_stock(commision_percentage, b_filename, p_filename)
 if action == 'sell':
-    sell(b_filename, s_filename, p_filename)
+    sell_stock(b_filename, s_filename, p_filename)
