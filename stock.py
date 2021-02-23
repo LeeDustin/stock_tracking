@@ -7,6 +7,15 @@ commision_percentage = 5
 stock_name = input("Input stock name:  ") or 'test'
 filename = stock_name+".xlsx"
 
+# # Iterating over one column - `f` is some function that processes your data
+# result = [f(x) for x in df['col']]
+# # Iterating over two columns, use `zip`
+# result = [f(x, y) for x, y in zip(df['col1'], df['col2'])]
+# # Iterating over multiple columns - same data type
+# result = [f(row[0], ..., row[n]) for row in df[['col1', ...,'coln']].to_numpy()]
+# # Iterating over multiple columns - differing data type
+# result = [f(row[0], ..., row[n]) for row in zip(df['col1'], ..., df['coln'])]
+
 # Function to insert row in the dataframe 
 def insert_row(row_num, orig_df, row_to_add):
     row_num= min(max(0, row_num), len(orig_df))
