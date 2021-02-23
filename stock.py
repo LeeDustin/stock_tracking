@@ -3,15 +3,28 @@ from os.path import abspath
 import os.path
 from os import path
 
-def buy_stock(c_percent, b_filename, p_filename):
-    
-    b_df = pd.read_excel(b_filename, index_col=None)
-    p_df = pd.read_excel(p_filename, index_col=None)
+commision_percentage = 5
+stock_name = input("Input stock name:  ") or 'test'
+filename = stock_name+".xlsx"
+
+# Function to insert row in the dataframe 
+def insert_row(row_num, orig_df, row_to_add):
+    row_num= min(max(0, row_num), len(orig_df))
+    df_part_1 = orig_df.loc[0:row_num]   
+    df_part_2 = orig_df.loc[row_num+1:]
+    df_final = df_part_1.append(row_to_add, ignore_index = True)
+    df_final = df_final.append(df_part_2, ignore_index = True)
+    return df_final
+
+def buy_stock():
+    print(filename)
+    b_df = pd.read_excel(filename, index_col=None, sheet_name='buy_history')
+    p_df = pd.read_excel(filename, index_col=None, sheet_name='profit_summary')
     # print(list(b_df.columns.values))
     # print(list(p_df.columns.values))
 
     date = input("Input transaction date (DD/MM/YYYY): ") or '-1'
-    price = int(input("Input stock unit price: ") or '-1') * (1+c_percent/100)
+    price = int(input("Input stock unit price: ") or '-1') * (1+commision_percentage/100)
     quantity = int(input("Input bought stock quantity: ") or '-1')
     cost = price * quantity
 
@@ -30,7 +43,7 @@ def buy_stock(c_percent, b_filename, p_filename):
     # append new transaction and write to buy_history.xlsx
     new_row = {'Date':date, 'Price':price, 'Quantity':quantity, 'Cost':cost, 'Holding':quantity}
     b_df = b_df.append(new_row, ignore_index=True)
-    b_df.to_excel(b_filename, index=False, ) 
+    b_df.to_excel(writer, index=False, sheet_name='buy_history') 
 
     # update profit_summary 
     p_holding = p_df.iloc[-1]['Total Holding']
@@ -48,8 +61,10 @@ def buy_stock(c_percent, b_filename, p_filename):
     new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding+quantity, \
         'Total Balance':p_balance-cost, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
     p_df = p_df.append(new_row, ignore_index=True)
-    p_df.to_excel(p_filename, index=False)
+    p_df.to_excel(writer, index=False, sheet_name='profit_summary')
 
+    print(b_df)
+    print(p_df)
 
 def sell_stock(b_filename, s_filename, p_filename):
     b_df = pd.read_excel(b_filename, index_col=None)
@@ -118,41 +133,30 @@ def sell_stock(b_filename, s_filename, p_filename):
     p_df = p_df.append(new_row, ignore_index=True)
     p_df.to_excel(p_filename, index=False)
 
-def create_new_stock(stock_name):
+def create_new_stock(stock_name, writer):
     print("Created new folder for " + stock_name)
 
 
-# Function to insert row in the dataframe 
-def insert_row(row_num, orig_df, row_to_add):
-    row_num= min(max(0, row_num), len(orig_df))
-    df_part_1 = orig_df.loc[0:row_num]   
-    df_part_2 = orig_df.loc[row_num+1:]
-    df_final = df_part_1.append(row_to_add, ignore_index = True)
-    df_final = df_final.append(df_part_2, ignore_index = True)
-    return df_final
+# stock_name = input("Input stock name:  ") or 'test'
 
-stock_name = input("Input stock name:  ") or 'test'
-
-with pd.ExcelWriter(stock_name+'.xlsx') as writer:  
-    df1.to_excel(writer, sheet_name='buy_history')
-    df2.to_excel(writer, sheet_name='sell_history')
-    df2.to_excel(writer, sheet_name='profit_summary')
+# with pd.ExcelWriter(stock_name+'.xlsx') as writer:  
+#     df1.to_excel(writer, sheet_name='buy_history')
+#     df2.to_excel(writer, sheet_name='sell_history')
+#     df2.to_excel(writer, sheet_name='profit_summary')
 
 if not path.exists(stock_name):
     exit("no stock named " + stock_name + " exists!")
+    with pd.ExcelWriter(stock_name+'.xlsx') as writer:
+        create_new_stock(stock_name, writer)
+
 
 b_filename = abspath('./'+stock_name+'/buy_history_test.xlsx')
 s_filename = abspath('./'+stock_name+'/sell_history_test.xlsx')
 p_filename = abspath('./'+stock_name+'/profit_summary_test.xlsx')
 
-# b_filename = abspath('./'+stock_name+'/buy_history.xlsx')
-# s_filename = abspath('./'+stock_name+'/sell_history.xlsx')
-# p_filename = abspath('./'+stock_name+'/profit_summary.xlsx')
-
-commision_percentage = 5
-
 action = input("Input transaction type: buy or sell? ") or 'buy'
-if action == 'buy':
-    buy_stock(commision_percentage, b_filename, p_filename)
-if action == 'sell':
-    sell_stock(b_filename, s_filename, p_filename)
+with pd.ExcelWriter(filename) as writer:
+    if action == 'buy':
+        buy_stock()
+    if action == 'sell':
+        sell_stock(writer)
