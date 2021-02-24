@@ -3,8 +3,11 @@ from os.path import abspath
 import os.path
 from os import path
 
-commision_percentage = 5
+commision_percentage = 1
 stock_name = input("Input stock name:  ") or 'test'
+b_filename = abspath('./'+stock_name+'/buy_history.xlsx')
+s_filename = abspath('./'+stock_name+'/sell_history.xlsx')
+p_filename = abspath('./'+stock_name+'/profit_summary.xlsx')
 # filename = stock_name+".xlsx"
 
 # # Iterating over one column - `f` is some function that processes your data
@@ -71,8 +74,13 @@ def buy_stock(b_filename, p_filename):
     new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding+quantity, \
         'Total Balance':p_balance-cost, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
     # p_df = insert_row(-1, p_df, new_row)
-    p_df.at[0] = new_row
-    b_df.at[0, 'Date'] = "Current"
+    p_df.at[0, "Date"]= "Current"
+    p_df.at[0, "Price"]= price
+    p_df.at[0, "Total Holding"]= p_holding+quantity
+    p_df.at[0, "Total Balance"]= p_balance-cost
+    p_df.at[0, "Realised Profit"]= p_rprofit
+    p_df.at[0, "Unrealised Profit"]= p_uprofit
+
     p_df = p_df.append(new_row, ignore_index=True)
     p_df.to_excel(p_filename, index=False)
 
@@ -104,13 +112,13 @@ def sell_stock(b_filename, s_filename, p_filename):
         if index == 0 or b_df.iloc[index]['Holding'] == 0:
             continue
         if b_df.iloc[index]['Holding'] >= remaining_quantity:
-            print("buying at index " + str(index) + ", holding >= remiaining")
+            # print("buying at index " + str(index) + ", holding >= remiaining")
             b_df.at[index, 'Holding'] = b_df.iloc[index]['Holding'] - remaining_quantity
             p_rprofit = p_rprofit + remaining_quantity * (price - b_df.at[index, 'Price'])
             b_df.at[0,'Holding'] = b_df.iloc[0]['Holding'] - remaining_quantity
             break
         if b_df.iloc[index]['Holding'] < remaining_quantity:
-            print("buying at index " + str(index) + ", holding < remiaining")
+            # print("buying at index " + str(index) + ", holding < remiaining")
             p_rprofit = p_rprofit + b_df.at[index, 'Holding'] * (price - b_df.at[index, 'Price'])
             remaining_quantity = remaining_quantity - b_df.iloc[index]['Holding']
             b_df.at[index, 'Holding'] = 0
@@ -144,29 +152,39 @@ def sell_stock(b_filename, s_filename, p_filename):
     # append new transaction and write to profit_summary.xlsx
     new_row = {'Date':date, 'Price':price, 'Total Holding':p_holding-quantity, \
         'Total Balance':p_balance+profit, 'Realised Profit':p_rprofit, 'Unrealised Profit':p_uprofit}
+    p_df.at[0, "Date"]= "Current"
+    p_df.at[0, "Price"]= price
+    p_df.at[0, "Total Holding"]= p_holding-quantity
+    p_df.at[0, "Total Balance"]= p_balance+profit
+    p_df.at[0, "Realised Profit"]= p_rprofit
+    p_df.at[0, "Unrealised Profit"]= p_uprofit
     p_df = p_df.append(new_row, ignore_index=True)
     p_df.to_excel(p_filename, index=False)
 
-def create_new_stock(stock_name, writer):
+def create_new_stock(stock_name):
+    os.mkdir(stock_name)
+
+    b_df= pd.DataFrame([["Total", 0, 0, 0, 0]], columns=['Date', 'Price', 'Quantity','Cost','Holding'])
+    s_df= pd.DataFrame([["Total", 0, 0, 0]], columns=['Date', 'Price', 'Quantity','Profit'])
+    p_df= pd.DataFrame([["Current", 0, 0, 0, 0, 0]], columns=['Date', 'Price', 'Total Holding','Total Balance','Realised Profit','Unrealised Profit'])
+
+    b_df.to_excel(b_filename, index=False)
+    s_df.to_excel(s_filename, index=False)
+    p_df.to_excel(p_filename, index=False)
+
     print("Created new folder for " + stock_name)
 
 
-# stock_name = input("Input stock name:  ") or 'test'
-
-# with pd.ExcelWriter(stock_name+'.xlsx') as writer:  
-#     df1.to_excel(writer, sheet_name='buy_history')
-#     df2.to_excel(writer, sheet_name='sell_history')
-#     df2.to_excel(writer, sheet_name='profit_summary')
-
 if not path.exists(stock_name):
-    exit("no stock named " + stock_name + " exists!")
-    with pd.ExcelWriter(stock_name+'.xlsx') as writer:
-        create_new_stock(stock_name, writer)
+    action = input("no stock named " + stock_name + " exists, create new folder? (Y/N)  ") or "Y"
+    if action == "N":
+        exit("Exiting program...")
+    elif action == "Y":
+        create_new_stock(stock_name)
+    else :
+        exit("Invalid response: not Y or N")
 
 
-b_filename = abspath('./'+stock_name+'/buy_history_test.xlsx')
-s_filename = abspath('./'+stock_name+'/sell_history_test.xlsx')
-p_filename = abspath('./'+stock_name+'/profit_summary_test.xlsx')
 
 action = input("Input transaction type: buy or sell? ") or 'buy'
 # with pd.ExcelWriter(filename) as writer:
