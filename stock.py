@@ -85,8 +85,11 @@ def buy_stock(b_filename, p_filename):
     p_df.to_excel(p_filename, index=False)
 
 
-    print(b_df)
-    print(p_df)
+    # print("b_df:")
+    # print(b_df)
+    # print("p_df:")
+    # print(p_df)
+
 
 def sell_stock(b_filename, s_filename, p_filename):
     b_df = pd.read_excel(b_filename, index_col=None)
@@ -160,6 +163,13 @@ def sell_stock(b_filename, s_filename, p_filename):
     p_df.at[0, "Unrealised Profit"]= p_uprofit
     p_df = p_df.append(new_row, ignore_index=True)
     p_df.to_excel(p_filename, index=False)
+
+    # print("b_df:")
+    # print(b_df)
+    # print("s_df:")
+    # print(s_df)
+    # print("p_df:")
+    # print(p_df)
 
 def create_new_stock(stock_name):
     os.mkdir(stock_name)
