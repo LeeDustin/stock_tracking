@@ -1,0 +1,11 @@
+- buy or sell: use "b" and "s"
+- yes or no: y/Y/n/N
+- transaction date: default today
+- input numbers can be non-integers
+- can continue actions
+- check bugs
+
+- checking function
+	- provide 1 file for adding today's date and stock price
+	- generate overview of realized/unrealized profit
+
