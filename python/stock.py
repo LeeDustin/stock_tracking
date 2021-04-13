@@ -2,6 +2,10 @@ import pandas as pd
 from os.path import abspath
 import os.path
 from os import path
+from datetime import date
+
+today = date.today()
+d1 = today.strftime("%d/%m/%Y")
 
 commision_percentage = 1
 stock_name = input("Input stock name:  ") or 'test'
@@ -34,9 +38,10 @@ def buy_stock(b_filename, p_filename):
     p_df = pd.read_excel(p_filename, index_col=None)
     # print(list(b_df.columns.values))
     # print(list(p_df.columns.values))
+    b_df['Cost'] = b_df['Cost'].astype(float)
 
-    date = input("Input transaction date (DD/MM/YYYY): ") or '-1'
-    price = int(input("Input stock unit price: ") or '-1') * (1+commision_percentage/100)
+    date = input("Input transaction date (DD/MM/YYYY), hit enter for default (today): ") or d1
+    price = float(input("Input stock unit price: ") or '-1') * (1+commision_percentage/100)
     quantity = int(input("Input bought stock quantity: ") or '-1')
     cost = price * quantity
 
@@ -44,9 +49,15 @@ def buy_stock(b_filename, p_filename):
     b_t_quantity = b_df.iloc[0]['Quantity']
     b_t_cost = b_df.iloc[0]['Cost']
     b_t_holding = b_df.iloc[0]['Holding']
+
+    print("orig_cost: " +str(b_t_cost))
+    print("added_cost: " + str(cost))
+
     b_t_quantity = b_t_quantity + quantity
     b_t_cost = b_t_cost + cost
     b_t_holding = b_t_holding + quantity
+
+    print("new_cost: " +str(b_t_cost) + str(type(b_t_cost)))
     b_df.at[0,'Quantity'] = b_t_quantity
     b_df.at[0, 'Cost'] = b_t_cost
     b_df.at[0,'Holding'] = b_t_holding
@@ -98,8 +109,8 @@ def sell_stock(b_filename, s_filename, p_filename):
     # print(list(p_df.columns.values))
 
 
-    date = input("Input transaction date (DD/MM/YYYY): ") or '-1'
-    price = int(input("Input stock unit price: ") or '-1')
+    date = input("Input transaction date (DD/MM/YYYY), hit enter for default (today): ") or d1
+    price = float(input("Input stock unit price: ") or '-1')
     quantity = int(input("Input sold stock quantity: ") or '-1')
     profit = price * quantity
 
@@ -187,9 +198,9 @@ def create_new_stock(stock_name):
 
 if not path.exists(stock_name):
     action = input("no stock named " + stock_name + " exists, create new folder? (Y/N)  ") or "Y"
-    if action == "N":
+    if action == "N" or action == "n" or action == "no" or action == "No":
         exit("Exiting program...")
-    elif action == "Y":
+    elif action == "Y" or action == "y" or action == "yes" or action == "Yes":
         create_new_stock(stock_name)
     else :
         exit("Invalid response: not Y or N")
@@ -198,7 +209,7 @@ if not path.exists(stock_name):
 
 action = input("Input transaction type: buy or sell? ") or 'buy'
 # with pd.ExcelWriter(filename) as writer:
-if action == 'buy':
+if action == 'buy' or action == 'b' or action == 'B':
     buy_stock(b_filename, p_filename)
-if action == 'sell':
+if action == 'sell'or action == 's' or action == 'S':
     sell_stock(b_filename, s_filename, p_filename)
