@@ -1,0 +1,56 @@
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body">
+      <h1 class="text-center mb-3"><i class="fa fa-plus"></i> New Entry</h1>
+      <%- include ("./partials/messages"); %>
+      <form action="/dashboard/newEntry" method="POST">
+        <div class="form-group">
+          <label for="entryType" class="form-label">New Entry Type</label>
+          <select name="entryType" class="form-control" id="entryType">
+            <% var options = [ "Region", "Customer"]; for ( var i = 0; i <
+            options.length; i++ ) { var selected = ( entryType == options[i] ) ?
+            "selected" : ""; %>
+            <option value="<%=options[ i ] %>" <%="selected" %>
+              name="entryType"><%=options[i] %>
+            </option>
+            <% } %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="region" class="form-label">Region</label>
+          <input
+            type="region"
+            id="region"
+            name="region"
+            class="form-control"
+            placeholder="Enter Region Name"
+            value="<%= typeof region != 'undefined' ? region : '' %>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="customer" class="form-label">Customer Name</label>
+          <input
+            type="customer"
+            id="customer"
+            name="customer"
+            class="form-control"
+            placeholder="Enter customer's name (if applicable)"
+            value="<%= typeof customer != 'undefined' ? customer : '' %>"
+          />
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          style="margin-top: 10px"
+          id="submit"
+          onclick="show()"
+        >
+          Submit
+        </button>
+      </form>
+      <p class="lead mt-4">
+        <a href="/dashboard">Back to Dashboard</a>
+      </p>
+    </div>
+  </div>
+</div>

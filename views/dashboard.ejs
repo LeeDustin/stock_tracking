@@ -1,0 +1,43 @@
+<%- include ("./partials/messages"); %>
+<h1 class="mt-4">Dashboard</h1>
+<p class="lead mb-3">Welcome Chito</p>
+<div class="row mt-4">
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-body">
+      <h5 class="card-title">New Entry</h5>
+      <p class="card-text">
+        Add in a new region or customer. Require updating database.
+      </p>
+      <a href="/dashboard/newEntry" class="btn btn-secondary">Add New Entry</a>
+    </div>
+  </div>
+
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-body">
+      <h5 class="card-title">Update Database</h5>
+      <p class="card-text">
+        Upload excel to update/add in corresponding table.
+      </p>
+      <a href="/dashboard/upload" class="btn btn-secondary">Upload Excel</a>
+    </div>
+  </div>
+
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-body">
+      <h5 class="card-title">Get Report</h5>
+      <p class="card-text">Download an excel file of your enquiry.</p>
+      <a href="/dashboard/download" class="btn btn-secondary">Download Excel</a>
+    </div>
+  </div>
+
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-body">
+      <h5 class="card-title">Get template</h5>
+      <p class="card-text">
+        Download template for updating region or customer data
+      </p>
+      <a href="/dashboard/template" class="btn btn-secondary">Download Template</a>
+    </div>
+  </div>
+
+</div>

@@ -1,2 +1,12 @@
-environment: python 3.9.1
-install pandas and openpyxl
+# stock-tracking
+track realized/unrealized profit and stock holding
+
+## quickstart (node)
+- clone repo
+- npm i
+- npm run dev
+- open on localhost:5000
+
+## quickstart (python)
+- environment: python 3.9.1
+- install pandas and openpyxl
