@@ -14,6 +14,8 @@ router.get('/views/css/views.css', (req, res) => {
     res.sendFile('/views/css/views.css', options);
 })
 
+// New Entry
+router.use('/newEntry', require('./newEntry'))
 
 
 module.exports = router;

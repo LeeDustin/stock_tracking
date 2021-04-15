@@ -3,39 +3,16 @@
     <div class="card card-body">
       <h1 class="text-center mb-3"><i class="fa fa-plus"></i> New Entry</h1>
       <%- include ("./partials/messages"); %>
-      <form action="/dashboard/newEntry" method="POST">
+      <form action="/newEntry" method="POST">
         <div class="form-group">
-          <label for="entryType" class="form-label">New Entry Type</label>
-          <select name="entryType" class="form-control" id="entryType">
-            <% var options = [ "Region", "Customer"]; for ( var i = 0; i <
-            options.length; i++ ) { var selected = ( entryType == options[i] ) ?
-            "selected" : ""; %>
-            <option value="<%=options[ i ] %>" <%="selected" %>
-              name="entryType"><%=options[i] %>
-            </option>
-            <% } %>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="region" class="form-label">Region</label>
+          <label for="stock" class="form-label">Stock name</label>
           <input
-            type="region"
-            id="region"
-            name="region"
+            type="stock"
+            id="stock"
+            name="stock"
             class="form-control"
-            placeholder="Enter Region Name"
-            value="<%= typeof region != 'undefined' ? region : '' %>"
-          />
-        </div>
-        <div class="form-group">
-          <label for="customer" class="form-label">Customer Name</label>
-          <input
-            type="customer"
-            id="customer"
-            name="customer"
-            class="form-control"
-            placeholder="Enter customer's name (if applicable)"
-            value="<%= typeof customer != 'undefined' ? customer : '' %>"
+            placeholder="Enter Stock Name"
+            value="<%= typeof stock != 'undefined' ? stock : '' %>"
           />
         </div>
         <button
@@ -49,7 +26,7 @@
         </button>
       </form>
       <p class="lead mt-4">
-        <a href="/dashboard">Back to Dashboard</a>
+        <a href="/">Back to Dashboard</a>
       </p>
     </div>
   </div>
