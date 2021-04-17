@@ -10,11 +10,21 @@ const stockSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  data: {
-    history: {
-      type: [transactionSchema],
-      require: true,
-    }
+  totalShares:{
+    type: Number,
+    required: true,
+  },
+  balance:{
+    type: Number,
+    required: true,
+  },
+  realizedProfit:{
+    type: Number,
+    required: true,
+  },
+  history: {
+    type: [transactionSchema],
+    require: true,
   },
 });
 

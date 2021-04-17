@@ -5,14 +5,14 @@
       <%- include ("./partials/messages"); %>
       <form action="/newEntry" method="POST">
         <div class="form-group">
-          <label for="stock" class="form-label">Stock name</label>
+          <label for="stockName" class="form-label">Stock Name</label>
           <input
-            type="stock"
-            id="stock"
-            name="stock"
+            type="stockName"
+            id="stockName"
+            name="stockName"
             class="form-control"
             placeholder="Enter Stock Name"
-            value="<%= typeof stock != 'undefined' ? stock : '' %>"
+            value="<%= typeof stockName != 'undefined' ? stockName : '' %>"
           />
         </div>
         <button

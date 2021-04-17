@@ -1,0 +1,13 @@
+<% if(typeof transactionType == 'undefined' || transactionType == 'Buy') { %> 
+    <select name="transactionType" class="form-control" id="transactionType">
+        <option selected value="Buy">Buy</option>
+        <option value="Sell">Sell</option>
+    </select>
+<% } %> 
+
+<% if(typeof transactionType != 'undefined' && transactionType == 'Sell') { %> 
+    <select name="transactionType" class="form-control" id="transactionType">
+        <option value="Buy">Buy</option>
+        <option selected value="Sell">Sell</option>
+    </select>
+<% } %> 

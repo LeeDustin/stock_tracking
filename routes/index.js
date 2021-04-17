@@ -17,5 +17,11 @@ router.get('/views/css/views.css', (req, res) => {
 // New Entry
 router.use('/newEntry', require('./newEntry'))
 
+// Transaction
+router.use('/transaction', require('./transaction'))
+
+// Check Profit
+router.use('/checkProfit', require('./checkProfit'))
+
 
 module.exports = router;

@@ -9,17 +9,21 @@ const transactionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  orig_price: {
+  origPrice: {
     type: Number,
-    required: true,
+    required: false,
   },
   price: {
     type: Number,
     required: true,
   },
-  amount: {
+  shares: {
     type: Number,
     required: true,
+  },
+  remainingShares: {
+    type: Number,
+    required: false,
   }
 });
 

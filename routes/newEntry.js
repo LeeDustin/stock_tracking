@@ -13,33 +13,36 @@ router.get("/", (req, res) => {
   
 // New Entry Handle
 router.post("/", (req, res) => {
-  const { stock } = req.body;
+  const { stockName } = req.body;
 
-  if (!stock) {
+  if (!stockName) {
     res.render("newEntry", {
         error_msg: "Please enter stock name"
       });
   } 
   else {
-    Stock.findOne({ stockName: stock}).then((_stock) => {
+    Stock.findOne({ stockName: stockName}).then((stock) => {
         // check if customer with same name from same region exists
-        if (_stock) {
+        if (stock) {
             res.render("newEntry", {
-            error_msg: `The stock ${stock} already exists`
+            error_msg: `The stock ${stockName} already exists`
             });
         } else {
             const newStock = new Stock({
-                stockName: stock,
-                data:{history:[]}
+                stockName: stockName,
+                totalShares:0,
+                balance:0,
+                realizedProfit:0,
+                history: []
               });
               newStock
                 .save()
-                .then((_stock) => {
+                .then((stock) => {
                   req.flash(
                     "success_msg",
-                    `stock ${_stock.stockName} added to database, please add in transaction data`
+                    `stock ${stock.stockName} added to database, please add in transaction data`
                   );
-                  res.redirect("/");
+                  res.redirect("/transaction");
                 })
                 .catch((err) => console.log(err));
         }
