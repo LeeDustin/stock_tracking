@@ -1,0 +1,60 @@
+<% if(typeof stockData != 'undefined') { %>
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-header">
+        <%= stockData.stockName %> Data
+      </div>
+    <table class="card-table table">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Balance</th>
+        <th scope="col">Realized Profit</th>
+        <th scope="col">Unrealized Profit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>original</td>
+        <td><%=stockData.origBalance%></td>
+        <td><%=stockData.origRealizedProfit%></td>
+        <td><%=stockData.origUnrealizedProfit%></td>
+      </tr>
+      <tr>
+        <td>new</td>
+        <td><%=stockData.newBalance%></td>
+        <td><%=stockData.newRealizedProfit%></td>
+        <td><%=stockData.newUnrealizedProfit%></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<% } %> 
+
+<% if(typeof overallData != 'undefined') { %>
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-header">
+        Overall Data
+      </div>
+    <table class="card-table table">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Balance</th>
+        <th scope="col">Realized Profit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>original</td>
+        <td><%=overallData.overallOrigBalance%></td>
+        <td><%=overallData.overallOrigRealizedProfit%></td>
+      </tr>
+      <tr>
+        <td>new</td>
+        <td><%=overallData.overallNewBalance%></td>
+        <td><%=overallData.overallNewRealizedProfit%></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+<% } %> 

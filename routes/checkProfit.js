@@ -1,5 +1,4 @@
 const express = require("express");
-const { truncate } = require("lodash");
 const router = express.Router();
 const _ = require("lodash")
 
@@ -11,8 +10,10 @@ router.get("/", (req, res) => {
     res.render("checkProfit");
 });
 
+commission_percentage = 1
+
 // New Entry Handle
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     let { stockName, transactionType, origPrice, stockAmount } = req.body;
     let errors = [];
 
@@ -41,7 +42,7 @@ router.post("/", (req, res) => {
     origPrice = parseFloat(origPrice)
     stockAmount = parseInt(stockAmount)
 
-    Stock.findOne({ stockName: stockName }).then((stock) => {
+    Stock.findOne({ stockName: stockName }).then(async (stock) => {
         // check if customer with same name from same region exists
         if (!stock) {
             return res.render("transaction", {
@@ -51,6 +52,15 @@ router.post("/", (req, res) => {
                 stockAmount
             });
         }
+        let overallOrigBalance = 0
+        let overallOrigRealizedProfit = 0
+
+        await Stock.find({}, function(err, stocks) {        
+            stocks.forEach(function(_stock) {
+                overallOrigBalance += _stock.balance
+                overallOrigRealizedProfit += _stock.realizedProfit
+            });
+          });
 
         let origBalance = stock.balance
         let origRealizedProfit = stock.realizedProfit
@@ -63,7 +73,8 @@ router.post("/", (req, res) => {
             shares: stockAmount
         }
         if (transactionType == "Buy") {
-            let price = origPrice * (1 + commision_percentage / 100)
+            let price = origPrice * (1 + commission_percentage / 100)
+            price = price.toFixed(2)
 
             newTransaction.price = price
             newTransaction.remainingShares = stockAmount
@@ -72,7 +83,7 @@ router.post("/", (req, res) => {
             stock.balance -= stockAmount * price
         }
         else if (transactionType == "Sell") {
-            if (stockAmount < stock.totalShares) {
+            if (stockAmount > stock.totalShares) {
                 return res.render("transaction", {
                     error_msg: `Your total amount of shares in ${stockName} is less than  ${stockAmount}`,
                     stockName,
@@ -84,15 +95,17 @@ router.post("/", (req, res) => {
 
             stock.totalShares -= stockAmount
             stock.balance += stockAmount * origPrice
-            stock.realized_profit += getRealizedProfit(stock.history, origPrice, stockAmount)
+            stock.realizedProfit += getRealizedProfit(stock.history, origPrice, stockAmount)
+            console.log("realizedProfit:", stock.realizedProfit)
         }
         stock.history.unshift(newTransaction)
 
-        let newBalance = stock.origBalance
+        let newBalance = stock.balance
         let newRealizedProfit = stock.realizedProfit
         let newUnrealizedProfit = getRealizedProfit(stock.history, origPrice, 0, true)
 
-        let result_obj = {
+        let stockData = {
+            stockName,
             origBalance,
             origRealizedProfit,
             origUnrealizedProfit,
@@ -100,7 +113,16 @@ router.post("/", (req, res) => {
             newRealizedProfit,
             newUnrealizedProfit,
         }
-        res.redirect("result", { data: result_obj })
+
+        let overallNewBalance = overallOrigBalance + newBalance - origBalance
+        let overallNewRealizedProfit = overallOrigRealizedProfit + newRealizedProfit - origRealizedProfit
+        let overallData = {
+            overallOrigBalance,
+            overallOrigRealizedProfit,
+            overallNewBalance,
+            overallNewRealizedProfit
+        }
+        res.render("results", { stockData, overallData })
     });
 });
 
@@ -109,25 +131,32 @@ function isInteger(value) {
 }
 
 
-function getRealizedProfit(history, price, amount, unrealized_flag) {
-    let index = 0;
+function getRealizedProfit(history, price, amount, unrealized_flag=false) {
+    let stock_amount = amount
+    let index = history.length -1;
     let realized_profit = 0;
-
-    while ((amount > 0 || unrealized_flag) && index >= history.length) {
-        if (history[index].type == "Sell") continue
-        if (amount <= history[index].remainingShares) {
-            history[index].remainingShares -= amount
-            realized_profit += (price - history[index].price) * amount
-            amount = 0
-        }
-        else if (amount > history[index].remainingShares) {
-            history[index].remainingShares = 0
-            realized_profit += (price - history[index].price) * history[index].remainingShares
-            amount -= history[index].remainingShares
-        }
-        index++
+  
+    console.log(history.length, price, amount,unrealized_flag)
+  
+    while ((stock_amount > 0 || unrealized_flag) && index >= 0) {
+      if (history[index].type == "Sell" || history[index].remainingShares == 0) {
+        index--;
+        continue
+      }
+      if (stock_amount <= history[index].remainingShares) {
+          history[index].remainingShares -= stock_amount
+          realized_profit += (price - history[index].price) * stock_amount
+          stock_amount = 0
+      }
+      else if (stock_amount > history[index].remainingShares) {
+          stock_amount -= history[index].remainingShares
+          realized_profit += (price - history[index].price) * history[index].remainingShares
+          history[index].remainingShares = 0
+      }
+      console.log(`turn ${index}, stock_amount: ${stock_amount}, remaining shares: ${history[index].remainingShares}`)
+      index--
     }
-    return realized_profit;
-}
+    return realized_profit.toFixed(2);
+  }
 
 module.exports = router

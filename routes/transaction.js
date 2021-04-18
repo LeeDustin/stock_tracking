@@ -11,7 +11,7 @@ const commission_percentage = 1
 // New Entry Page
 router.get("/", (req, res) => {
     res.render("transaction", {
-      success_msg: `Commission percentage for buying is ${commision_percentage}%`
+      success_msg: `Commission percentage for buying is ${commission_percentage}%`
     });
   });
   
@@ -62,7 +62,7 @@ router.post("/", (req, res) => {
         shares: stockAmount
       }
       if (transactionType == "Buy"){
-        let price = origPrice*(1+commision_percentage/100)
+        let price = origPrice*(1+commission_percentage/100)
 
         newTransaction.price = price
         newTransaction.remainingShares = stockAmount
@@ -71,7 +71,7 @@ router.post("/", (req, res) => {
         stock.balance -= stockAmount * price
       }
       else if (transactionType == "Sell"){
-        if (stockAmount < stock.totalShares){
+        if (stockAmount > stock.totalShares){
           return res.render("transaction", {
             error_msg: `Your total amount of shares in ${stockName} is less than  ${stockAmount}`,
             stockName,
@@ -83,17 +83,15 @@ router.post("/", (req, res) => {
 
         stock.totalShares -= stockAmount
         stock.balance += stockAmount * origPrice
-        stock.realized_profit += getRealizedProfit(stock.history, origPrice, stockAmount)
+        stock.realizedProfit += getRealizedProfit(stock.history, origPrice, stockAmount)
       }
       stock.history.unshift(newTransaction)
       stock
         .save()
         .then(() => {
-          req.flash(
-            "success_msg",
-            `Transaction added to database`
-          );
-          res.render("transaction");
+          res.render("transaction", {
+            success_msg: "Transaction added to database"
+          });
         })
         .catch((err) => console.log(err));
       })
@@ -105,22 +103,30 @@ function isInteger(value) {
 }
 
 
-function getRealizedProfit (history, price, amount){
-  let index = 0;
+function getRealizedProfit(history, price, amount, unrealized_flag=false) {
+  let stock_amount = amount
+  let index = history.length -1;
   let realized_profit = 0;
 
-  while (amount > 0){
-    if (history[index].type == "Sell") continue
-    if (amount <= history[index].remainingShares){
-      history[index].remainingShares -= amount
-      realized_profit += (price-history[index].price) * amount
-      amount = 0
+  console.log(history.length, price, amount,unrealized_flag)
+
+  while ((stock_amount > 0 || unrealized_flag) && index >= 0) {
+    if (history[index].type == "Sell" || history[index].remainingShares == 0) {
+      index--;
+      continue
     }
-    else if (amount > history[index].remainingShares){
-      history[index].remainingShares = 0
-      realized_profit += (price-history[index].price) * history[index].remainingShares
-      amount -= history[index].remainingShares
+    if (stock_amount <= history[index].remainingShares) {
+        history[index].remainingShares -= stock_amount
+        realized_profit += (price - history[index].price) * stock_amount
+        stock_amount = 0
     }
+    else if (stock_amount > history[index].remainingShares) {
+        stock_amount -= history[index].remainingShares
+        realized_profit += (price - history[index].price) * history[index].remainingShares
+        history[index].remainingShares = 0
+    }
+    console.log(`turn ${index}, stock_amount: ${stock_amount}, remaining shares: ${history[index].remainingShares}`)
+    index--
   }
   return realized_profit;
 }
