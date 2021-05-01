@@ -1,0 +1,34 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <h1 class="text-center mb-3"><i class="fa fa-money-check-alt"></i> Check Stock</h1>
+        <%- include ("./partials/messages"); %>
+        <form action="/checkStock" method="POST">
+          <div class="form-group">
+            <label for="stockName" class="form-label">Stock Name</label>
+            <input
+              type="stockName"
+              id="stockName"
+              name="stockName"
+              class="form-control"
+              placeholder="Enter Stock Name"
+              value="<%= typeof stockName != 'undefined' ? stockName : '' %>"
+            />
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            style="margin-top: 10px"
+            id="submit"
+            onclick="show()"
+          >
+            Submit
+          </button>
+        </form>
+        <p class="lead mt-4">
+          <a href="/">Back to Dashboard</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  

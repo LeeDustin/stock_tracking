@@ -23,5 +23,8 @@ router.use('/transaction', require('./transaction'))
 // Check Profit
 router.use('/checkProfit', require('./checkProfit'))
 
+// Check Stock
+router.use('/checkStock', require('./checkStock'))
+
 
 module.exports = router;

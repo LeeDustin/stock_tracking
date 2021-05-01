@@ -58,3 +58,31 @@
   </table>
   </div>
 <% } %> 
+
+<% if(typeof stockHistory != 'undefined') { %>
+  <div class="card mx-auto" style="width: 25rem">
+    <div class="card-header">
+      <%= stockHistory.stockName %> Transaction History
+      </div>
+    <table class="card-table table">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Type</th>
+        <th scope="col">Price</th>
+        <th scope="col">Shares</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% stockHistory.stockHistory.forEach(function(transaction) { %>
+      <tr>
+        <td><%=transaction.date%></td>
+        <td><%=transaction.type%></td>
+        <td><%=transaction.price%></td>
+        <td><%=transaction.shares%></td>
+      </tr>
+    <% }); %>  
+    </tbody>
+  </table>
+  </div>
+<% } %> 

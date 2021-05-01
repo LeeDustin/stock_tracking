@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
         }
     }
     if (errors.length > 0) {
-        return res.render("transaction", {
+        return res.render("checkProfit", {
             errors,
             stockName,
             origPrice,
@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
     Stock.findOne({ stockName: stockName }).then(async (stock) => {
         // check if customer with same name from same region exists
         if (!stock) {
-            return res.render("transaction", {
+            return res.render("checkProfit", {
                 error_msg: `The stock ${stockName} does not exist`,
                 stockName,
                 origPrice,
@@ -84,7 +84,7 @@ router.post("/", async (req, res) => {
         }
         else if (transactionType == "Sell") {
             if (stockAmount > stock.totalShares) {
-                return res.render("transaction", {
+                return res.render("checkProfit", {
                     error_msg: `Your total amount of shares in ${stockName} is less than  ${stockAmount}`,
                     stockName,
                     origPrice
