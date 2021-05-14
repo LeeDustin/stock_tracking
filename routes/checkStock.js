@@ -32,7 +32,10 @@ router.post("/", async (req, res) => {
 
         let stockHistory = {
             stockName: stockName,
-            stockHistory: stock.history
+            stockHistory: stock.history,
+            totalShares: stock.totalShares,
+            balance: stock.balance,
+            realizedProfit: stock.realizedProfit,
         }
         res.render("results", { stockHistory })
     });

@@ -63,26 +63,47 @@
   <div class="card mx-auto" style="width: 25rem">
     <div class="card-header">
       <%= stockHistory.stockName %> Transaction History
-      </div>
+    </div>
     <table class="card-table table">
-    <thead>
-      <tr>
-        <th scope="col"></th>
-        <th scope="col">Type</th>
-        <th scope="col">Price</th>
-        <th scope="col">Shares</th>
-      </tr>
-    </thead>
-    <tbody>
-    <% stockHistory.stockHistory.forEach(function(transaction) { %>
-      <tr>
-        <td><%=transaction.date%></td>
-        <td><%=transaction.type%></td>
-        <td><%=transaction.price%></td>
-        <td><%=transaction.shares%></td>
-      </tr>
-    <% }); %>  
-    </tbody>
-  </table>
+      <thead>
+        <tr>
+          <th scope="col">Transaction Time</th>
+          <th scope="col">Type</th>
+          <th scope="col">Price</th>
+          <th scope="col">Shares</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% stockHistory.stockHistory.forEach(function(transaction) { %>
+        <tr>
+          <td><%=transaction.date%></td>
+          <td><%=transaction.type%></td>
+          <td><%=transaction.price%></td>
+          <td><%=transaction.shares%></td>
+        </tr>
+      <% }); %>  
+      </tbody>
+    </table>
+  </div>
+  <div class="card mx-auto" style="width: 25rem; height: 10rem;">
+    <div class="card-header">
+        <%= stockHistory.stockName %> Summary
+    </div>
+    <table class="card-table table">
+      <thead>
+        <tr>
+          <th scope="col">Total Shares</th>
+          <th scope="col">Balance</th>
+          <th scope="col">Realized Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%=stockHistory.totalShares%></td>
+          <td><%=stockHistory.balance%></td>
+          <td><%=stockHistory.realizedProfit%></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 <% } %> 
