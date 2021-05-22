@@ -60,7 +60,7 @@
 <% } %> 
 
 <% if(typeof stockHistory != 'undefined') { %>
-  <div class="card mx-auto" style="width: 25rem">
+  <div class="card mx-auto">
     <div class="card-header">
       <%= stockHistory.stockName %> Transaction History
     </div>
@@ -85,7 +85,7 @@
       </tbody>
     </table>
   </div>
-  <div class="card mx-auto" style="width: 25rem; height: 10rem;">
+  <div class="card mx-auto" style="height: 10rem;">
     <div class="card-header">
         <%= stockHistory.stockName %> Summary
     </div>
@@ -94,6 +94,7 @@
         <tr>
           <th scope="col">Total Shares</th>
           <th scope="col">Balance</th>
+          <th scope="col">Average Balance</th>
           <th scope="col">Realized Profit</th>
         </tr>
       </thead>
@@ -101,6 +102,7 @@
         <tr>
           <td><%=stockHistory.totalShares%></td>
           <td><%=stockHistory.balance%></td>
+          <td><%=stockHistory.balance/stockHistory.totalShares%></td>
           <td><%=stockHistory.realizedProfit%></td>
         </tr>
       </tbody>

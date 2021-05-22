@@ -30,6 +30,7 @@ router.post("/", (req, res) => {
         } else {
             const newStock = new Stock({
                 stockName: stockName,
+                createDate: new Date().toLocaleString('en-US', {timeZone: 'Hongkong'}),
                 totalShares:0,
                 balance:0,
                 realizedProfit:0,

@@ -7,8 +7,8 @@ const stockSchema = new mongoose.Schema({
     required: true,
   },
   createDate: {
-    type: Date,
-    default: Date.now(),
+    type: String,
+    default: Date().toLocaleString('en-US', {timeZone: 'Hongkong'}),
   },
   totalShares:{
     type: Number,

@@ -59,7 +59,8 @@ router.post("/", (req, res) => {
       let newTransaction = {
         type: transactionType,
         origPrice: origPrice,
-        shares: stockAmount
+        shares: stockAmount,
+        date: new Date().toLocaleString('en-US', {timeZone: 'Hongkong'})
       }
       if (transactionType == "Buy"){
         let price = origPrice*(1+commission_percentage/100)
